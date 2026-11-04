@@ -78,13 +78,19 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
         android:text="התחבר/הירשם"
-        android:backgroundTint="#5383EC"
+        android:backgroundTint="#FFFFFF"
         app:cornerRadius="12dp"
         android:fontFamily="@font/google_sans"
         android:textFontWeight="700"
         android:textSize="16sp"
+        android:textColor="#202124"
+        app:strokeWidth="3dp"
+        app:strokeColor="#5383EC"
+        android:elevation=""
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etPassword" />
+
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
