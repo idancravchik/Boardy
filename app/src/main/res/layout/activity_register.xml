@@ -25,11 +25,23 @@
         app:layout_constraintTop_toTopOf="parent"
         />
 
+    <TextView
+        android:id="@+id/tvInfo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="48dp"
+        android:text="הזן את הפרטים שלך כדי להירשם"
+        android:fontFamily="@font/google_sans"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/etEmail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="12dp"
         android:minHeight="48dp"
         app:boxStrokeColor="#5383EC"
         app:layout_constraintEnd_toEndOf="parent"
@@ -37,7 +49,7 @@
         app:hintEnabled="true"
         android:hint="אימייל"
         app:hintTextColor="#202124"
-        app:layout_constraintTop_toBottomOf="@+id/tvTitle">
+        app:layout_constraintTop_toBottomOf="@+id/tvInfo">
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -82,29 +94,26 @@
             />
     </com.google.android.material.textfield.TextInputLayout>
 
-
-    <com.google.android.material.button.MaterialButton
+    <com.example.devbox.ui.DepthButton
         android:id="@+id/btnLogin"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
         android:layout_marginHorizontal="48dp"
+        android:layout_marginTop="32dp"
+        android:fontFamily="@font/google_sans"
         android:text="הירשם"
         android:textColor="#202124"
         android:textSize="18sp"
         android:textStyle="bold"
-        android:fontFamily="@font/google_sans"
-        android:background="@drawable/btn_blue"
-        android:stateListAnimator="@animator/btn_press"
-        app:backgroundTint="@null"
-        app:elevation="0dp"
-        app:strokeWidth="0dp"
-        android:paddingTop="12dp"
-        android:paddingBottom="18dp"
-        app:layout_constraintStart_toStartOf="parent"
+        app:db_cornerRadius="14dp"
+        app:db_depth="6dp"
+        app:db_faceColor="#FFFFFF"
+        app:db_shadowColor="#5383EC"
+        app:db_strokeColor="#5383EC"
+        app:db_strokeWidth="2dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etPasswordVal" />
-
-
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etPasswordVal"
+        android:onClick="switchToMain"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

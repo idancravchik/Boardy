@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Devbox</string>
+    <string name="register"><u>עוד לא נרשמתם?</u></string>
 </resources>

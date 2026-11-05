@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="DepthButton">
+        <!-- Standard Android attributes -->
+        <attr name="android:text" />
+        <attr name="android:textColor" />
+        <attr name="android:textSize" />
+        <attr name="android:textStyle" />
+        <attr name="android:fontFamily" />
+        <attr name="android:maxLines" />
+        <attr name="android:singleLine" />
+        <attr name="android:ellipsize" />
+        <attr name="android:icon" />
+
+        <!-- Custom Depth Button attributes (only 3D depth features) -->
+        <attr name="db_faceColor" format="color" />
+        <attr name="db_shadowColor" format="color" />
+        <attr name="db_depth" format="dimension" />
+        <attr name="db_cornerRadius" format="dimension" />
+        <attr name="db_strokeWidth" format="dimension" />
+        <attr name="db_strokeColor" format="color" />
+
+        <!-- Icon configuration -->
+        <attr name="db_iconTint" format="color" />
+        <attr name="db_iconGravity" format="enum">
+            <enum name="start" value="1" />
+            <enum name="textStart" value="2" />
+            <enum name="end" value="3" />
+            <enum name="textEnd" value="4" />
+            <enum name="top" value="16" />
+            <enum name="textTop" value="32" />
+        </attr>
+        <attr name="db_iconSize" format="dimension" />
+        <attr name="db_iconPadding" format="dimension" />
+    </declare-styleable>
+</resources>
