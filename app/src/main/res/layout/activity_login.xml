@@ -12,83 +12,78 @@
         android:id="@+id/tvTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="128dp"
         android:fontFamily="@font/reisinger_michal"
         android:gravity="center"
         android:rotation="5"
         android:text="מוכן להתחיל ליצור?"
-        android:textSize="24sp"
+        android:textSize="48sp"
         android:textStyle="bold"
         android:textColor="#202124"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
-    <TextView
-        android:id="@+id/tvEmailLabel"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
-        android:text="אימייל"
-        android:fontFamily="@font/google_sans"
-        android:textFontWeight="700"
-        android:textSize="16sp"
-        android:textColor="#202124"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
-
-    <EditText
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/etEmail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="48dp"
         android:minHeight="48dp"
+        app:boxStrokeColor="#5383EC"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvEmailLabel" />
+        app:hintEnabled="true"
+        android:hint="אימייל"
+        app:hintTextColor="#202124"
+        app:layout_constraintTop_toBottomOf="@+id/tvTitle">
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
 
-    <TextView
-        android:id="@+id/tvPasswordLabel"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="סיסמא"
-        android:fontFamily="@font/google_sans"
-        android:textFontWeight="700"
-        android:textSize="16sp"
-        android:textColor="#202124"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etEmail" />
-
-    <EditText
+    <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/etPassword"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="16dp"
         android:minHeight="48dp"
+        app:boxStrokeColor="#5383EC"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvPasswordLabel" />
+        app:hintEnabled="true"
+        android:hint="סיסמא"
+        app:hintTextColor="#202124"
+        app:layout_constraintTop_toBottomOf="@+id/etEmail">
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btnLogin"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="32dp"
-        android:text="התחבר/הירשם"
-        android:backgroundTint="#FFFFFF"
-        app:cornerRadius="12dp"
-        android:fontFamily="@font/google_sans"
-        android:textFontWeight="700"
-        android:textSize="16sp"
+        android:layout_marginHorizontal="48dp"
+        android:text="התחבר"
         android:textColor="#202124"
-        app:strokeWidth="3dp"
-        app:strokeColor="#5383EC"
-        android:elevation=""
-        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:fontFamily="@font/google_sans"
+        android:background="@drawable/btn_blue"
+        android:stateListAnimator="@animator/btn_press"
+        app:backgroundTint="@null"
+        app:elevation="0dp"
+        app:strokeWidth="0dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="18dp"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etPassword" />
 
 
