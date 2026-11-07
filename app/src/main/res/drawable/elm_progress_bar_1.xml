@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item android:gravity="left|center_vertical" android:left="20dp">
+        <shape android:shape="line">
+            <size android:width="440dp"/>
+            <stroke android:width="12dp"
+                android:color="#F1BF42"/>
+        </shape>
+    </item>
+
+    <item android:gravity="left|center_vertical">
+        <shape android:shape="oval">
+            <solid android:color="#F1BF42"/>
+            <size android:width="48dp"
+                  android:height="48dp"/>
+        </shape>
+    </item>
+
+    <item android:gravity="left|center_vertical" android:left="146dp">
+        <shape android:shape="oval">
+            <solid android:color="#F1BF42"/>
+            <size android:width="48dp"
+                android:height="48dp"/>
+        </shape>
+    </item>
+
+    <item android:gravity="left|center_vertical" android:left="292dp">
+        <shape android:shape="oval">
+            <solid android:color="#F1BF42"/>
+            <size android:width="48dp"
+                android:height="48dp"/>
+        </shape>
+    </item>
+
+    <item android:gravity="left|center_vertical" android:left="438dp">
+        <shape android:shape="oval">
+            <solid android:color="#5383EC"/>
+            <size android:width="48dp"
+                android:height="48dp"/>
+        </shape>
+    </item>
+
+    //איקונים
+    <item
+        android:drawable="@drawable/ic_settings"
+        android:gravity="left|center_vertical"
+        android:left="447dp"
+        android:width="30dp"
+        android:height="30dp" />
+
+    <item
+        android:drawable="@drawable/ic_connections"
+        android:gravity="left|center_vertical"
+        android:left="301dp"
+        android:width="30dp"
+        android:height="30dp" />
+
+    <item
+        android:drawable="@drawable/ic_code"
+        android:gravity="left|center_vertical"
+        android:left="155dp"
+        android:width="30dp"
+        android:height="30dp" />
+    <item
+        android:drawable="@drawable/ic_upload"
+        android:gravity="left|center_vertical"
+        android:left="9dp"
+        android:width="30dp"
+        android:height="30dp" />
+
+    //טקסט
+    <item
+
+        android:gravity="left|top"
+        android:left="420dp"
+        android:top="85dp"
+        android:width="90dp"
+        android:height="20dp">
+        <vector xmlns:android="http://schemas.android.com/apk/res/android"
+            android:width="60dp"
+            android:height="12dp"
+            android:viewportWidth="60"
+            android:viewportHeight="12">
+            <path
+                android:pathData="M6.06,-0C11.98,-0 12.46,3.42 12.46,7.22V11.94H10.18V6.74C10.18,3.2 9.04,2.2 6.48,2.2H4.5V11.94H0V9.74H2.22V-0H6.06ZM16.94,11.94H14.66V-0H16.94V11.94ZM28.098,11.94H25.818V6.92C25.818,3.2 24.078,2.2 21.938,2.2H19.138V-0H21.478C26.798,-0 28.098,3.02 28.098,6.6V11.94ZM36.559,11.94H34.279V5.74C34.279,4.38 34.739,2.76 35.979,2.2H29.019L28.999,-0H38.859V2.2C37.159,2.94 36.559,4.38 36.559,5.74V11.94ZM42.476,-0C45.096,-0 46.496,1.66 46.496,4.42V11.94H44.216V8H43.816C42.616,8 41.736,8.72 41.736,10.74V11.94H39.456V10.82C39.456,8.04 41.016,6 43.876,6H44.216V4.34C44.216,3.02 43.836,2.2 42.536,2.2H40.856V-0H42.476ZM59.143,11.94H56.863V6.34C56.863,3.74 55.863,2.2 53.363,2.2H48.303V-0H52.903C57.323,-0 59.143,2.44 59.143,6.22V11.94ZM50.583,11.94H48.303V5.52H50.583V11.94Z"
+                android:fillColor="#202124"/>
+        </vector>
+    </item>
+
+
+</layer-list>

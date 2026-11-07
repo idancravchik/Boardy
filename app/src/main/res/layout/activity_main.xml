@@ -107,19 +107,20 @@
         android:id="@+id/btnLogout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
+        android:layout_marginLeft="16dp"
         android:layout_marginTop="40dp"
         android:fontFamily="@font/google_sans"
-        android:icon="@drawable/door_open"
-        app:db_iconSize="34dp"
-        app:db_iconTint="#D85140"
-
+        android:text="התנתק"
+        android:textSize="16sp"
         app:db_cornerRadius="15000dp"
         app:db_depth="6dp"
         app:db_faceColor="#FFFFFF"
+
         app:db_shadowColor="#D85140"
         app:db_strokeColor="#D85140"
         app:db_strokeWidth="2dp"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>
