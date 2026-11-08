@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -21,6 +22,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.Firebase;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "FIREBASE";
@@ -28,7 +30,7 @@ public class LoginActivity extends AppCompatActivity {
     private DepthButton btnLogin;
     private TextInputLayout etEmail;
     private TextInputLayout etPassword;
-
+    private TextView tvToRegister;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,11 +41,15 @@ public class LoginActivity extends AppCompatActivity {
         btnLogin = findViewById(R.id.btnLogin);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
+        tvToRegister = findViewById(R.id.tvToRegister);
+
         mAuth = FirebaseAuth.getInstance();
 
         //ליסנרים
         btnLogin.setOnClickListener(view -> login());
+        tvToRegister.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this, SignupActivity.class)));
     }
+
 
     private void login() {
         String email = etEmail.getEditText().getText().toString();

@@ -85,6 +85,7 @@
         app:layout_constraintTop_toBottomOf="@+id/etPassword" />
 
     <TextView
+        android:id="@+id/tvToRegister"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="48dp"
@@ -95,8 +96,7 @@
         android:textColor="#202124"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:onClick="switchToRegister"/>
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
 
