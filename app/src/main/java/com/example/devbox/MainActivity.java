@@ -17,16 +17,9 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
 
 
-        setContentView(R.layout.activity_login);
-
-
-    }
-
-    public void switchToRegister(View view) {
-        setContentView(R.layout.activity_register);
-    }
-
-    public void switchToMain(View view) {
         setContentView(R.layout.activity_main);
+
+
     }
+
 }

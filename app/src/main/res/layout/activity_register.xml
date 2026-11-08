@@ -95,7 +95,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.example.devbox.ui.DepthButton
-        android:id="@+id/btnLogin"
+        android:id="@+id/btnSignup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="48dp"
@@ -113,7 +113,6 @@
         app:db_strokeWidth="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etPasswordVal"
-        android:onClick="switchToMain"/>
+        app:layout_constraintTop_toBottomOf="@+id/etPasswordVal" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
