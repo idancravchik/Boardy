@@ -19,7 +19,7 @@
         android:text="מוכן להתחיל ליצור?"
         android:textSize="48sp"
         android:textStyle="bold"
-        android:textColor="#202124"
+        android:textColor="@color/gray_900"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -31,12 +31,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="48dp"
         android:minHeight="48dp"
-        app:boxStrokeColor="#5383EC"
+        app:boxStrokeColor="@color/blue_500"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:hintEnabled="true"
         android:hint="אימייל"
-        app:hintTextColor="#202124"
+        app:hintTextColor="@color/gray_900"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle">
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
@@ -50,12 +50,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:minHeight="48dp"
-        app:boxStrokeColor="#5383EC"
+        app:boxStrokeColor="@color/blue_500"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:hintEnabled="true"
         android:hint="סיסמא"
-        app:hintTextColor="#202124"
+        app:hintTextColor="@color/gray_900"
         app:layout_constraintTop_toBottomOf="@+id/etEmail">
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
@@ -70,13 +70,13 @@
         android:layout_marginTop="32dp"
         android:layout_marginHorizontal="48dp"
         android:text="התחבר"
-        android:textColor="#202124"
+        android:textColor="@color/gray_900"
         android:textSize="18sp"
         android:textStyle="bold"
         android:fontFamily="@font/google_sans"
-        app:db_faceColor="#FFFFFF"
-        app:db_shadowColor="#5383EC"
-        app:db_strokeColor="#5383EC"
+        app:db_faceColor="@color/white_1000"
+        app:db_shadowColor="@color/blue_500"
+        app:db_strokeColor="@color/blue_500"
         app:db_strokeWidth="2dp"
         app:db_cornerRadius="14dp"
         app:db_depth="6dp"
@@ -93,10 +93,9 @@
         android:fontFamily="@font/google_sans"
         android:text="@string/register"
         android:textAlignment="center"
-        android:textColor="#202124"
+        android:textColor="@color/gray_900"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-
