@@ -24,4 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "Devbox"
 include(":app")
- 
+include(":FlashingService")

@@ -33,6 +33,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":FlashingService"))
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
     implementation(libs.constraintlayout)
