@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:drawable="@drawable/ic_upload_loader">
+    <target
+        android:animation="@animator/anim_ring_shrink"
+        android:name="ring_path"/>
+    <target
+        android:animation="@animator/anim_ring_spin"
+        android:name="ring_group"/>
+
+
+</animated-vector>

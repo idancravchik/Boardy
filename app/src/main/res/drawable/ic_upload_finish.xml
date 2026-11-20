@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="240dp"
+    android:height="240dp"
+    android:viewportHeight="100"
+    android:viewportWidth="100">
+
+    <!--הקבוצה הכללית של כאילו כל הכפתור, להגדלה של הכל ביחד, הפיבוט זה כדי שיגדל מהאמצע-->
+    <group
+        android:name="root_group"
+        android:pivotX="50"
+        android:pivotY="50"
+        android:scaleX="1"
+        android:scaleY="1">
+
+        <path
+            android:pathData="M100 50C100 77.6142 77.6142 100 50 100C22.3858 100 0 77.6142 0 50C0 22.3858 22.3858 0 50 0C77.6142 0 100 22.3858 100 50Z"
+            android:fillColor="@color/blue_500"
+            android:strokeWidth="0.5"
+            android:strokeColor="@color/blue_100"/>
+
+        <!--זה העיגול שהוא קו מתאר כדי שיהיה אפשר לקצר אותו-->
+        <group
+            android:name="ring_group"
+            android:translateX="5"
+            android:translateY="5"
+            android:pivotX="45"
+            android:pivotY="45">
+            <!---->
+            <path
+                android:name="ring_path"
+                android:pathData="M45,45m-43.5,0a43.5,43.5 0,1 1,87 0a43.5,43.5 0,1 1,-87 0"
+                android:strokeColor="@color/white_1000"
+                android:strokeWidth="4"
+                android:strokeLineCap="round"
+                android:trimPathEnd="0.25"
+                />
+        </group>
+
+
+
+        <!--זה הוי שמצטייר בסוף-->
+        <group
+            android:name="check_group"
+            android:pivotX="50"
+            android:pivotY="50"
+            android:translateX="26"
+            android:translateY="29">
+            <path
+                android:name="check_path"
+                android:pathData="M1.78,19.001L19.28,36.755L53.78,1.755"
+                android:strokeWidth="5"
+                android:fillColor="#00000000"
+                android:strokeColor="#ffffff"
+                android:trimPathEnd="0"/>
+        </group>
+
+
+
+    </group>
+
+
+</vector>

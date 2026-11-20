@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:drawable="@drawable/ic_upload_button">
+
+    <!--הקובץ הזה מפרט את האנימציה של השלב הראשון של הלחיצה -
+    הגדלת כפתור, טעינת טבעץ, ולהעלים את האייקון של האמצע!-->
+
+    <!--הגדלה-->
+    <target
+        android:animation="@animator/anim_button_grow"
+        android:name="root_group"/>
+    <!--טעינת טבעת-->
+    <target
+        android:animation="@animator/anim_ring_fill"
+        android:name="ring_path"/>
+    <!--העלמת אייקון-->
+    <target
+        android:animation="@animator/anim_icon_fade"
+        android:name="icon_path"/>
+
+</animated-vector>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<animated-vector android:drawable="@drawable/ic_upload_finish"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <target
+        android:animation="@animator/anim_ring_remove"
+        android:name="ring_path"/>
+    <target
+        android:animation="@animator/anim_check_draw"
+        android:name="check_path"/>
+</animated-vector>

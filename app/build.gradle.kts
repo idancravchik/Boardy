@@ -1,3 +1,5 @@
+import org.gradle.kotlin.dsl.implementation
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.google.gms.google.services)
@@ -34,6 +36,7 @@ android {
 
 dependencies {
     implementation(project(":FlashingService"))
+    implementation("androidx.vectordrawable:vectordrawable-seekable:1.0.0")
     implementation(libs.activity.ktx)
     implementation(libs.appcompat)
     implementation(libs.constraintlayout)
