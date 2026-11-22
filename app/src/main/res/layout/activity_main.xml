@@ -6,11 +6,12 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
+        android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="368dp"
+        android:layout_marginTop="200dp"
         android:fontFamily="@font/reisinger_michal"
-        android:rotation="10.8"
+        android:rotation="7"
         android:text="מוכן להתחיל ליצור?"
         android:textAlignment="center"
         android:textColor="@color/gray_900"
@@ -22,12 +23,10 @@
 
     <com.example.devbox.ui.DepthButton
         android:id="@+id/btnDashboards"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="52dp"
-        android:layout_marginTop="204dp"
+        android:layout_marginTop="12dp"
         android:fontFamily="@font/google_sans"
-        android:rotation="-20.75"
         android:text="לוחות בקרה"
         android:textColor="@color/gray_900"
         android:textSize="18sp"
@@ -38,17 +37,15 @@
         app:db_shadowColor="@color/green_500"
         app:db_strokeColor="@color/green_500"
         app:db_strokeWidth="2dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/btnMyProjectsPublicProjects"
+        app:layout_constraintStart_toStartOf="@+id/btnMyProjectsPublicProjects"
+        app:layout_constraintTop_toBottomOf="@+id/btnMyProjectsPublicProjects" />
 
     <com.example.devbox.ui.DepthButton
         android:id="@+id/btnNew"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="204dp"
-        android:layout_marginTop="276dp"
         android:fontFamily="@font/google_sans"
-        android:rotation="15.35"
         android:text="פרויקט חדש"
         android:textColor="@color/gray_900"
         android:textSize="18sp"
@@ -59,17 +56,17 @@
         app:db_shadowColor="@color/blue_500"
         app:db_strokeColor="@color/blue_500"
         app:db_strokeWidth="2dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_marginTop="24dp"
+        app:layout_constraintEnd_toEndOf="@+id/btnMyProjectsPublicProjects"
+        app:layout_constraintStart_toStartOf="@+id/btnMyProjectsPublicProjects"
+        app:layout_constraintTop_toBottomOf="@+id/textView2" />
 
     <com.example.devbox.ui.DepthButton
         android:id="@+id/btnMyProjects"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="44dp"
-        android:layout_marginTop="432dp"
+        android:layout_marginTop="12dp"
         android:fontFamily="@font/google_sans"
-        android:rotation="11.51"
         android:text="הפרויקטים שלי"
         android:textColor="@color/gray_900"
         android:textSize="18sp"
@@ -80,17 +77,16 @@
         app:db_shadowColor="@color/red_500"
         app:db_strokeColor="@color/red_500"
         app:db_strokeWidth="2dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="@+id/btnMyProjectsPublicProjects"
+        app:layout_constraintStart_toStartOf="@+id/btnMyProjectsPublicProjects"
+        app:layout_constraintTop_toBottomOf="@+id/btnNew" />
 
     <com.example.devbox.ui.DepthButton
         android:id="@+id/btnMyProjectsPublicProjects"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="156dp"
-        android:layout_marginTop="508dp"
+        android:layout_marginTop="12dp"
         android:fontFamily="@font/google_sans"
-        android:rotation="-24.11"
         android:text="פרויקטים ציבוריים"
         android:textColor="@color/gray_900"
         android:textSize="18sp"
@@ -101,8 +97,10 @@
         app:db_shadowColor="@color/yellow_500"
         app:db_strokeColor="@color/yellow_500"
         app:db_strokeWidth="2dp"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnMyProjects" />
 
     <com.example.devbox.ui.DepthButton
         android:id="@+id/btnLogout"

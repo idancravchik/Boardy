@@ -19,22 +19,26 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.vectordrawable.graphics.drawable.SeekableAnimatedVectorDrawable;
 
+import com.example.devbox.ui.DepthButton;
+
 import java.io.IOException;
 
 public class UploaderActivity extends AppCompatActivity {
 
     //-------------------אלמנטים----------------------------
     private ImageView btnUpload;
-    private SeekableAnimatedVectorDrawable btUpload_hold;
+    private SeekableAnimatedVectorDrawable btnUpload_hold;
     private SeekableAnimatedVectorDrawable upload_loaderAvd;
     private SeekableAnimatedVectorDrawable loaderAvd;
     private ImageView btnBack;
+    private DepthButton btnHome;
     private TextView tvUpload;
     private ViewFlipper vfUploader;
 
 
     //-------------------שירותים----------------------------
     private final ValueAnimator timer = new ValueAnimator();
+    long maxDuration;
     private MediaPlayer mp;
 
     //-------------------משתנים ותכונות---------------------
@@ -46,7 +50,6 @@ public class UploaderActivity extends AppCompatActivity {
     private String cCode; // הקוד מהגנרטור בC שמקבלים באינטנט
     private String projectName; // שם הפרויקט שמקבלים באינטנט
 
-    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,11 +63,12 @@ public class UploaderActivity extends AppCompatActivity {
         vfUploader = findViewById(R.id.vfUploader);
         tvUpload = findViewById(R.id.tvUpload);
         btnBack = findViewById(R.id.btnBack);
+        btnHome = findViewById(R.id.btnHome);
         btnUpload = findViewById(R.id.btUpload);
-        btUpload_hold = SeekableAnimatedVectorDrawable.create(this, R.drawable.avd_upload_hold);
-        btnUpload.setImageDrawable(btUpload_hold);
+        btnUpload_hold = SeekableAnimatedVectorDrawable.create(this, R.drawable.avd_upload_hold);
+        btnUpload.setImageDrawable(btnUpload_hold);
 
-        long maxDuration = btUpload_hold.getTotalDuration(); // לוקחים את האורך האמיתי מה-AVD
+        maxDuration = btnUpload_hold.getTotalDuration(); // לוקחים את האורך האמיתי מה-AVD
         timer.setInterpolator(new LinearInterpolator());
         mp = MediaPlayer.create(this, R.raw.se_button_charge);
         //----------------קוד התחלה----------------
@@ -75,68 +79,32 @@ public class UploaderActivity extends AppCompatActivity {
             startActivity(new Intent(UploaderActivity.this, EditorActivity.class));
             finish();
         });
+        btnHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(UploaderActivity.this, MainActivity.class));
+                finish();
+            }
+        });
 
         //אלו ליסנרים לניהול הכפתור העלאה:
         timer.addUpdateListener(animation -> {
             int animatedValue = (int) animation.getAnimatedValue();
             // הגנה מפני חריגה מגבולות 0 ועד maxDuration
             long playTime = Math.max(0L, Math.min(maxDuration, animatedValue));
-            btUpload_hold.setCurrentPlayTime(playTime);
+            btnUpload_hold.setCurrentPlayTime(playTime);
         }); // שם את האנימציה במקום הנכון לפי הזמן
 
         timer.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                // בודקים אם הגענו ממש לסוף (ולא נעצרנו באמצע ע"י cancel)
-                if (timer.getAnimatedValue() != null && (int) timer.getAnimatedValue() == maxDuration) {
-                    upload_loaderAvd = (SeekableAnimatedVectorDrawable)SeekableAnimatedVectorDrawable.create(UploaderActivity.this, R.drawable.avd_upload_loader);
-                    btnUpload.setImageDrawable(upload_loaderAvd);
-                    if (upload_loaderAvd != null) {
-                        btnUpload.setClickable(false);
-                        upload_loaderAvd.start();
-                        tvUpload.setText("מעלה...");
-                    }
-
-                }
+                switchToLoader(animation);
             }
         });
-        btnUpload.setOnTouchListener((v, event) -> {
-            // המיקום המדויק שבו האנימציה נמצאת כרגע (אם טרם התחילה, הערך הוא 0)
-            int currentPos = timer.getAnimatedValue() != null ? (int) timer.getAnimatedValue() : 0;
-
-            if (upload_loaderAvd != null) { // זה מוע שילחצון אחרי שכבר עבנו לשלב הבא של הלודר
-                return true;
-            }
-
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    Log.d("BUTTON", "DOWN!");
-
-                    mp.seekTo(0); // מפעיל מוזיקה
-                    mp.start();
-
-                    timer.cancel(); // עוצרים כל תנועה קודמת
-                    timer.setIntValues(currentPos, (int) maxDuration); // רצים מהנקודה הנוכחית עד הסוף
-                    timer.setDuration(maxDuration - currentPos); // הזמן שנשאר עד הסוף
-                    timer.start();
-                    return true;
-
-                case MotionEvent.ACTION_UP:
-                case MotionEvent.ACTION_CANCEL:
-                    Log.d("BUTTON", "UP!");
-                    if (currentPos > 0 && currentPos < maxDuration) {
-
-                        mp.pause();
-
-                        timer.cancel(); // עוצרים את ההתקדמות קדימה
-                        timer.setIntValues(currentPos, 0); // רצים בדיוק מהנקודה הנוכחית חזרה ל0
-                        timer.setDuration(300L); // חזרה מהירה
-                        timer.start();
-                    }
-                    return true;
-            }
-            return false;
-        }); // מנהל את הלחיצה על הכפתור ואת החזרה אחורה
+        btnUpload.setOnTouchListener((view, motionEvent) -> {
+            uploadTouchManager(view, motionEvent);
+            return true;
+        });
 
 
     }
@@ -161,8 +129,68 @@ public class UploaderActivity extends AppCompatActivity {
         upload_loaderAvd.stop();
         SeekableAnimatedVectorDrawable finishAvd = SeekableAnimatedVectorDrawable.create(UploaderActivity.this, R.drawable.avd_upload_finish);
         btnUpload.setImageDrawable(finishAvd);
+        //עכשיו קולבק שעובר עמוד רק כשהאנימציה הסתיימה
+        finishAvd.registerAnimationCallback(new SeekableAnimatedVectorDrawable.AnimationCallback() {
+            @Override
+            public void onAnimationEnd(@NonNull SeekableAnimatedVectorDrawable drawable) {
+                super.onAnimationEnd(drawable);
+                finishAvd.unregisterAnimationCallback(this); //מכבה את הקולבק
+                updateProcess(UploaderState.UPLOAD_FINISHED);
+            }
+        });
         finishAvd.start();
-        updateProcess(UploaderState.UPLOAD_FINISHED);
+    }
+    //זה פעולה שמנהלת את התזמון של הלחיצה על הכפתור העלאה וסופרת זמן עד שזה מסתיים
+    public boolean uploadTouchManager(View v, MotionEvent event) {
+        // המיקום המדויק שבו האנימציה נמצאת כרגע (אם טרם התחילה, הערך הוא 0)
+        int currentPos = timer.getAnimatedValue() != null ? (int) timer.getAnimatedValue() : 0;
+
+        if (upload_loaderAvd != null) { // זה מוע שילחצון אחרי שכבר עבנו לשלב הבא של הלודר
+            return true;
+        }
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                Log.d("BUTTON", "DOWN!");
+
+                mp.seekTo(0); // מפעיל מוזיקה
+                mp.start();
+
+                timer.cancel(); // עוצרים כל תנועה קודמת
+                timer.setIntValues(currentPos, (int) maxDuration); // רצים מהנקודה הנוכחית עד הסוף
+                timer.setDuration(maxDuration - currentPos); // הזמן שנשאר עד הסוף
+                timer.start();
+                return true;
+
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                Log.d("BUTTON", "UP!");
+                if (currentPos > 0 && currentPos < maxDuration) {
+
+                    mp.pause();
+
+                    timer.cancel(); // עוצרים את ההתקדמות קדימה
+                    timer.setIntValues(currentPos, 0); // רצים בדיוק מהנקודה הנוכחית חזרה ל0
+                    timer.setDuration(300L); // חזרה מהירה
+                    timer.start();
+                }
+                return true;
+        }
+        return false;
+    }
+    //זה פעולה שמעבירה בסוף הזמן לאנימציה של הלודר ועוצרת את הקודם
+    public void switchToLoader(Animator animation) {
+        // בודקים אם הגענו ממש לסוף (ולא נעצרנו באמצע ע"י cancel)
+        if (timer.getAnimatedValue() != null && (int) timer.getAnimatedValue() == maxDuration) {
+            upload_loaderAvd = (SeekableAnimatedVectorDrawable)SeekableAnimatedVectorDrawable.create(UploaderActivity.this, R.drawable.avd_upload_loader);
+            btnUpload.setImageDrawable(upload_loaderAvd);
+            if (upload_loaderAvd != null) {
+                btnUpload.setClickable(false);
+                upload_loaderAvd.start();
+                tvUpload.setText("מעלה...");
+            }
+
+        }
     }
 
 

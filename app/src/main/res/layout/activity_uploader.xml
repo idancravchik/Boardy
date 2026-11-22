@@ -163,7 +163,7 @@
                 android:textColor="@color/gray_900"/>
 
             <com.example.devbox.ui.DepthButton
-                android:id="@+id/btnToConsole"
+                android:id="@+id/btnConsole"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
@@ -178,12 +178,12 @@
                 app:db_shadowColor="@color/green_500"
                 app:db_strokeColor="@color/green_500"
                 app:db_strokeWidth="2dp"
-                app:layout_constraintBottom_toTopOf="@+id/btnToHome"
-                app:layout_constraintEnd_toEndOf="@+id/btnToHome"
-                app:layout_constraintStart_toStartOf="@+id/btnToHome" />
+                app:layout_constraintBottom_toTopOf="@+id/btnHome"
+                app:layout_constraintEnd_toEndOf="@+id/btnHome"
+                app:layout_constraintStart_toStartOf="@+id/btnHome" />
 
             <com.example.devbox.ui.DepthButton
-                android:id="@+id/btnToHome"
+                android:id="@+id/btnHome"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/google_sans"

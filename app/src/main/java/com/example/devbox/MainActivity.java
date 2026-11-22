@@ -40,13 +40,12 @@ public class MainActivity extends AppCompatActivity {
 
         mAuth = FirebaseAuth.getInstance();
 
-        btnNewProject.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, UploaderActivity.class));
-                finish();
-            }
+        btnNewProject.setOnClickListener(v -> {
+            startActivity(new Intent(MainActivity.this, UploaderActivity.class));
+            finish();
         });
+        btnLogout.setOnClickListener(view -> logout());
+
 
     }
 

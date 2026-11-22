@@ -48,7 +48,11 @@
             android:name=".UploaderActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize" />
-        <!--להחזיר לפולס אחרי שהמסך עובד כמו שצריך!-->
+        <!-- להחזיר לפולס אחרי שהמסך עובד כמו שצריך! -->
+        <activity
+            android:name=".ConsoleActivity"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>
