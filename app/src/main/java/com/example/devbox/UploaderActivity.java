@@ -3,7 +3,6 @@ package com.example.devbox;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -39,7 +38,8 @@ public class UploaderActivity extends AppCompatActivity {
     //-------------------שירותים----------------------------
     private final ValueAnimator timer = new ValueAnimator();
     long maxDuration;
-    private MediaPlayer mp;
+    private MediaPlayer seHold;
+    private MediaPlayer seSuccess;
 
     //-------------------משתנים ותכונות---------------------
     enum UploaderState {
@@ -70,7 +70,8 @@ public class UploaderActivity extends AppCompatActivity {
 
         maxDuration = btnUpload_hold.getTotalDuration(); // לוקחים את האורך האמיתי מה-AVD
         timer.setInterpolator(new LinearInterpolator());
-        mp = MediaPlayer.create(this, R.raw.se_button_charge);
+        seHold = MediaPlayer.create(this, R.raw.se_button_charge);
+        seSuccess = MediaPlayer.create(this, R.raw.se_upload_success);
         //----------------קוד התחלה----------------
         updateProcess(UploaderState.UPLOAD_READY);
 
@@ -139,6 +140,7 @@ public class UploaderActivity extends AppCompatActivity {
             }
         });
         finishAvd.start();
+        seSuccess.start();
     }
     //זה פעולה שמנהלת את התזמון של הלחיצה על הכפתור העלאה וסופרת זמן עד שזה מסתיים
     public boolean uploadTouchManager(View v, MotionEvent event) {
@@ -153,8 +155,8 @@ public class UploaderActivity extends AppCompatActivity {
             case MotionEvent.ACTION_DOWN:
                 Log.d("BUTTON", "DOWN!");
 
-                mp.seekTo(0); // מפעיל מוזיקה
-                mp.start();
+                seHold.seekTo(0); // מפעיל מוזיקה
+                seHold.start();
 
                 timer.cancel(); // עוצרים כל תנועה קודמת
                 timer.setIntValues(currentPos, (int) maxDuration); // רצים מהנקודה הנוכחית עד הסוף
@@ -167,7 +169,7 @@ public class UploaderActivity extends AppCompatActivity {
                 Log.d("BUTTON", "UP!");
                 if (currentPos > 0 && currentPos < maxDuration) {
 
-                    mp.pause();
+                    seHold.pause();
 
                     timer.cancel(); // עוצרים את ההתקדמות קדימה
                     timer.setIntValues(currentPos, 0); // רצים בדיוק מהנקודה הנוכחית חזרה ל0
