@@ -12,13 +12,13 @@
         android:id="@+id/tvTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="128dp"
+        android:layout_marginTop="4dp"
         android:fontFamily="@font/reisinger_michal"
-        android:gravity="center"
-        android:rotation="5"
+        android:gravity="start"
         android:text="ברוך הבא!"
         android:textSize="48sp"
         android:textStyle="bold"
+        android:textAlignment="textStart"
         android:textColor="@color/gray_900"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -29,10 +29,10 @@
         android:id="@+id/tvInfo"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="2dp"
         android:text="הזן את הפרטים שלך כדי להירשם"
         android:fontFamily="@font/google_sans"
-        android:textAlignment="center"
+        android:textAlignment="textStart"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
@@ -93,13 +93,53 @@
             android:layout_height="wrap_content"
             />
     </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/etSchool"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="42dp"
+        android:minHeight="48dp"
+        app:boxStrokeColor="@color/blue_500"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:hintEnabled="true"
+        android:hint="בית ספר"
+
+        app:hintTextColor="@color/gray_900"
+        app:layout_constraintTop_toBottomOf="@+id/etPasswordVal">
+        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:simpleItems="@array/tempSchools"/>
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/datePickerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="תאריך לידה"
+        app:endIconDrawable="@drawable/ic_calendar_24"
+        app:endIconMode="custom"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/etSchool">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etdatePicker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:clickable="true"
+            android:cursorVisible="false"
+            android:focusable="false" />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
 
     <com.example.devbox.ui.DepthButton
         android:id="@+id/btnSignup"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="48dp"
-        android:layout_marginTop="32dp"
         android:fontFamily="@font/google_sans"
         android:text="הירשם"
         android:textColor="@color/gray_900"
@@ -111,8 +151,9 @@
         app:db_shadowColor="@color/blue_500"
         app:db_strokeColor="@color/blue_500"
         app:db_strokeWidth="2dp"
+        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/etPasswordVal" />
+        app:layout_constraintTop_toBottomOf="@+id/datePickerLayout" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

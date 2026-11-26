@@ -1,4 +1,10 @@
 <resources>
     <string name="app_name">Devbox</string>
     <string name="register"><u>עוד לא נרשמתם?</u></string>
+    <string-array name="tempSchools">
+        <item>אורט חקלאי פרדס חנה</item>
+        <item>אורט שחר פרדס חנה</item>
+        <item>אורט יצחק נבון חדרה</item>
+        <item>מבואות עירון</item>
+    </string-array>
 </resources>
