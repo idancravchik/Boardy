@@ -26,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private DepthButton btnLogout;
     private DepthButton btnNewProject;
+    private DepthButton btnMyProjects;
 
 
     @Override
@@ -37,11 +38,16 @@ public class MainActivity extends AppCompatActivity {
 
         btnLogout = findViewById(R.id.btnLogout);
         btnNewProject = findViewById(R.id.btnNew);
+        btnMyProjects = findViewById(R.id.btnMyProjects);
 
         mAuth = FirebaseAuth.getInstance();
 
         btnNewProject.setOnClickListener(v -> {
-            startActivity(new Intent(MainActivity.this, UploaderActivity.class));
+            startActivity(new Intent(MainActivity.this, EditorActivity.class));
+            finish();
+        });
+        btnMyProjects.setOnClickListener(view -> {
+            startActivity(new Intent(MainActivity.this, PrivateProjectsActivity.class));
             finish();
         });
         btnLogout.setOnClickListener(view -> logout());
