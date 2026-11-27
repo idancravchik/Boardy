@@ -63,11 +63,9 @@ public class MainActivity extends AppCompatActivity {
 
         btnNewProject.setOnClickListener(v -> {
             startActivity(new Intent(MainActivity.this, EditorActivity.class));
-            finish();
         });
         btnMyProjects.setOnClickListener(view -> {
             startActivity(new Intent(MainActivity.this, PrivateProjectsActivity.class));
-            finish();
         });
         btnLogout.setOnClickListener(view -> logout());
 

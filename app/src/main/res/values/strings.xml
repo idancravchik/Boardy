@@ -7,4 +7,10 @@
         <item>אורט יצחק נבון חדרה</item>
         <item>מבואות עירון</item>
     </string-array>
+    <string-array name="sensors">
+        <item>חיישן מזג אוויר</item>
+        <item>מנורה</item>
+        <item>מנוע</item>
+        <item>לחצן</item>
+    </string-array>
 </resources>

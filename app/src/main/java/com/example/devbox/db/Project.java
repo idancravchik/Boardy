@@ -14,6 +14,23 @@ public class Project {
     private long createdAt;
     private long updatedAt;
 
+    public Project() { }
+
+    public Project(String id, String title, String description, String blocksData, String port1Sensor, String port2Sensor, boolean isPublic, String userId, String userName, String school, long createdAt, long updatedAt) {
+        this.id = id;
+        this.title = title;
+        this.description = description;
+        this.blocksData = blocksData;
+        this.port1Sensor = port1Sensor;
+        this.port2Sensor = port2Sensor;
+        this.isPublic = isPublic;
+        this.userId = userId;
+        this.userName = userName;
+        this.school = school;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
+
     public String getId() {
         return id;
     }

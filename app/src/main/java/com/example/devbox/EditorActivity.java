@@ -1,6 +1,12 @@
 package com.example.devbox;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.AutoCompleteTextView;
+import android.widget.Button;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,11 +14,291 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.example.devbox.db.Project;
+import com.example.devbox.db.Student;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.materialswitch.MaterialSwitch;
+import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.sql.Ref;
+
 public class EditorActivity extends AppCompatActivity {
+
+    private FirebaseFirestore db;
+    private FirebaseAuth mauth;
+    private BottomSheetDialog dSettings;
+    private Button btnSaveSettings;
+    private Button btnSettings;
+    private TextView tvProjectName;
+    private TextInputLayout etProjectName;
+    private TextInputLayout etDescription;
+    private TextInputLayout dmSensor1;
+    private TextInputLayout dmSensor2;
+    private MaterialSwitch swPublic;
+    private String intentfrom;
+    private Project currentProject;
+    private Student currentStudent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+
+        mauth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
+        dSettings = new BottomSheetDialog(this);
+        dSettings.setContentView(R.layout.dialog_project_settings);
+        dSettings.setCancelable(false);
+        btnSaveSettings = dSettings.findViewById(R.id.btnSaveProject);
+        etProjectName = dSettings.findViewById(R.id.etProjectName);
+        etDescription = dSettings.findViewById(R.id.etDescription);
+        dmSensor1 = dSettings.findViewById(R.id.dmSensor1);
+        dmSensor2 = dSettings.findViewById(R.id.dmSensor2);
+        swPublic = dSettings.findViewById(R.id.swPublic);
+        btnSettings = findViewById(R.id.btnSettings);
+        tvProjectName = findViewById(R.id.tvProjectName);
+
+        //טוען משתמש נוכחי
+        db.collection("users").document(mauth.getCurrentUser().getUid()).get().addOnSuccessListener(documentSnapshot -> currentStudent = documentSnapshot.toObject(Student.class));
+
+        dSettings.setOnDismissListener(dialog -> {
+            // אם המשתמש נכנס בטעות ויוצא חוזרים למסך הבית
+            if (currentProject == null) {
+                finish();
+            }
+        });
+
+        //בדיקה מאיפה הגיעו והפניה או להגדרות חדשות או לעריכה
+        intentfrom = getIntent().getStringExtra("projectId");
+        if (intentfrom == null) {
+            dSettings.setCancelable(true);
+            dSettings.show();
+        } else {
+            //מייבא את הפרויקט וקורא לטעינה שלו
+            db.collection("projects").document(intentfrom).get().addOnSuccessListener(documentSnapshot -> {
+                currentProject = documentSnapshot.toObject(Project.class);
+                loadProject();
+            });
+
+        }
+        //ניתוב כפתור שמירת הגדרות לפרויקט חדש או קיים
+        btnSaveSettings.setOnClickListener(v -> {
+            if (intentfrom == null) {
+                newProject();
+            } else {
+                updateProjectSettings();
+            }
+        });
+
+        btnSettings.setOnClickListener(v -> loadProjectSettings());
+    }
+    //נקרא כשפותחים את החלון מפרויקט קיים ואחראי לטעון את הפרויקט לסביבת העבודה
+    private void loadProject() {
+        tvProjectName.setText(currentProject.getTitle());
+        //TODO: טעינה של המסך בלוקים עצמו
+    }
+    //נקרא כשלוחצים שמור בהגדרות פרויקט חדש, ואחראי לפתוח אותו כפרויקט חדש בפיירסטור
+    private void newProject() {
+        btnSaveSettings.setEnabled(false);
+
+        //בדיקה שיש לפרויקט שם
+        if (etProjectName.getEditText().getText().toString().isEmpty()) {
+            Toast.makeText(this, "חייב להביא שם לפרויקט", Toast.LENGTH_SHORT).show();
+            btnSaveSettings.setEnabled(true);
+            return;
+        }
+
+        //הכנת פרמטרים לפרויקט החדש
+        DocumentReference ref = db.collection("projects").document();
+        String newProjectId = ref.getId();
+        String port1Sensor;
+        String port2Sensor;
+        switch (dmSensor1.getEditText().getText().toString()) {
+            case "חיישן מזג אוויר":
+                port1Sensor = "temphum";
+                break;
+            case "מנורה":
+                port1Sensor = "led";
+                break;
+            case "מנוע":
+                port1Sensor = "servo";
+                break;
+            case "לחצן":
+                port1Sensor = "button";
+                break;
+            default:
+                port1Sensor = "";
+        }
+        switch (dmSensor2.getEditText().getText().toString()) {
+            case "חיישן מזג אוויר":
+                port2Sensor = "temphum";
+                break;
+            case "מנורה":
+                port2Sensor = "led";
+                break;
+            case "מנוע":
+                port2Sensor = "servo";
+                break;
+            case "לחצן":
+                port2Sensor = "button";
+                break;
+            default:
+                port2Sensor = "";
+        }
+
+        //יצורים את הפרויקט החדש, מעלים לפיירסטור, וטוענים למסך
+        Project newProject = new Project(
+                newProjectId,
+                etProjectName.getEditText().getText().toString(),
+                etDescription.getEditText().getText().toString(),
+                "",
+                port1Sensor,
+                port2Sensor,
+                swPublic.isChecked(),
+                currentStudent.getId(),
+                currentStudent.getFullName(),
+                currentStudent.getSchool(),
+                System.currentTimeMillis(),
+                System.currentTimeMillis());
+        ref.set(newProject).addOnSuccessListener(aVoid -> {
+            currentProject = newProject;
+            btnSaveSettings.setEnabled(true);
+            dSettings.setCancelable(true);
+            Toast.makeText(this, "הפרויקט שלך נוצר בהצלחה!", Toast.LENGTH_SHORT).show();
+            dSettings.dismiss();
+            loadProject();
+        }).addOnFailureListener(e -> {
+            btnSaveSettings.setEnabled(true);
+            Toast.makeText(this, "שגיאה ביצירת הפרויקט", Toast.LENGTH_SHORT).show();
+        });
+    }
+    //נקרא כשלוחצים שמור בהגדרות פרויקט קיים, ואחראי לעדכן את האובייקט בפיירסטור
+    private void updateProjectSettings() {
+        btnSaveSettings.setEnabled(false);
+
+        //בדיקה שיש לפרויקט שם
+        if (etProjectName.getEditText().getText().toString().isEmpty()) {
+            Toast.makeText(this, "חייב להביא שם לפרויקט", Toast.LENGTH_SHORT).show();
+            btnSaveSettings.setEnabled(true);
+            return;
+        }
+
+        //הכנת פרמטרים לפרויקט החדש
+        String port1Sensor;
+        String port2Sensor;
+        switch (dmSensor1.getEditText().getText().toString()) {
+            case "חיישן מזג אוויר":
+                port1Sensor = "temphum";
+                break;
+            case "מנורה":
+                port1Sensor = "led";
+                break;
+            case "מנוע":
+                port1Sensor = "servo";
+                break;
+            case "לחצן":
+                port1Sensor = "button";
+                break;
+            default:
+                port1Sensor = "";
+        }
+        switch (dmSensor2.getEditText().getText().toString()) {
+            case "חיישן מזג אוויר":
+                port2Sensor = "temphum";
+                break;
+            case "מנורה":
+                port2Sensor = "led";
+                break;
+            case "מנוע":
+                port2Sensor = "servo";
+                break;
+            case "לחצן":
+                port2Sensor = "button";
+                break;
+            default:
+                port2Sensor = "";
+        }
+
+        //יצורים את הפרויקט החדש, מעלים לפיירסטור, וטוענים למסך
+        currentProject.setTitle(etProjectName.getEditText().getText().toString());
+        currentProject.setDescription(etDescription.getEditText().getText().toString());
+        currentProject.setPublic(swPublic.isChecked());
+        currentProject.setPort1Sensor(port1Sensor);
+        currentProject.setPort2Sensor(port2Sensor);
+        currentProject.setUpdatedAt(System.currentTimeMillis());
+
+        db.collection("projects").document(currentProject.getId()).set(currentProject).addOnSuccessListener(aVoid -> {
+            btnSaveSettings.setEnabled(true);
+            dSettings.setCancelable(true);
+            Toast.makeText(this, "הפרויקט שלך נוצר בהצלחה!", Toast.LENGTH_SHORT).show();
+            dSettings.dismiss();
+            loadProject();
+        }).addOnFailureListener(e -> {
+            btnSaveSettings.setEnabled(true);
+            Toast.makeText(this, "שגיאה ביצירת הפרויקט", Toast.LENGTH_SHORT).show();
+        });
+    }
+    //נקרא כשלוחצים שמור בהגדרות פרויקט קיים, ואחראי לעדכן את האובייקט בפיירסטור
+
+
+//נקרא כשפותחים את התפריט הגדרות בפרויקט קיים ואחראי לטעון את המידע הקיים לתוך השדות
+private void loadProjectSettings() {
+    //מילוי שדות
+    etProjectName.getEditText().setText(currentProject.getTitle());
+    etDescription.getEditText().setText(currentProject.getDescription());
+    swPublic.setChecked(currentProject.isPublic());
+
+    String sensor1Display;
+    switch (currentProject.getPort1Sensor() != null ? currentProject.getPort1Sensor() : "") {
+        case "temphum":
+            sensor1Display = "חיישן מזג אוויר";
+            break;
+        case "led":
+            sensor1Display = "מנורה";
+            break;
+        case "servo":
+            sensor1Display = "מנוע";
+            break;
+        case "button":
+            sensor1Display = "לחצן";
+            break;
+        default:
+            sensor1Display = "";
+    }
+    String sensor2Display;
+    switch (currentProject.getPort2Sensor() != null ? currentProject.getPort2Sensor() : "") {
+        case "temphum":
+            sensor2Display = "חיישן מזג אוויר";
+            break;
+        case "led":
+            sensor2Display = "מנורה";
+            break;
+        case "servo":
+            sensor2Display = "מנוע";
+            break;
+        case "button":
+            sensor2Display = "לחצן";
+            break;
+        default:
+            sensor2Display = "";
+    }
+    AutoCompleteTextView acSensor1 = (AutoCompleteTextView) dmSensor1.getEditText();
+    AutoCompleteTextView acSensor2 = (AutoCompleteTextView) dmSensor2.getEditText();
+    acSensor1.setText(sensor1Display, false);
+    acSensor2.setText(sensor2Display, false);
+
+    dSettings.setCancelable(true);
+    dSettings.show();
+
+
+}
+    private void saveProject() {
+        // TODO: שומר את הבלוקים לפיירסטור
     }
 }

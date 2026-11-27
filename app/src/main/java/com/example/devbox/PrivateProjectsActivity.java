@@ -20,15 +20,21 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.devbox.db.Project;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
 public class PrivateProjectsActivity extends AppCompatActivity {
 
-
+    private FirebaseFirestore db;
+    private FirebaseAuth mauth;
     private RecyclerView rvProjects;
     private ProjectsAdapter adapter;
     private ArrayList<Project> projects = new ArrayList<Project>();
+
 
 
     @Override
@@ -39,24 +45,20 @@ public class PrivateProjectsActivity extends AppCompatActivity {
 
         rvProjects = findViewById(R.id.rvProjects);
         rvProjects.setLayoutManager(new LinearLayoutManager(this));
+        mauth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
-        Project p1 = new Project();
-        p1.setId("1"); p1.setTitle("מד טמפרטורה"); p1.setDescription("מציג טמפרטורה ולחות בחדר"); p1.setPublic(false); p1.setPort1Sensor("temphum"); p1.setPort2Sensor("led");
-        projects.add(p1);
 
-        Project p2 = new Project();
-        p2.setId("2"); p2.setTitle("שער חכם"); p2.setDescription("נפתח ונסגר בלחיצת כפתור"); p2.setPublic(true); p2.setPort1Sensor("button"); p2.setPort2Sensor("servo");
-        projects.add(p2);
-
-        Project p3 = new Project();
-        p3.setId("3"); p3.setTitle("תאורת לילה"); p3.setDescription("בדיקה של פרויקט עם חיישן אחד בלבד"); p3.setPublic(false); p3.setPort1Sensor("led"); p3.setPort2Sensor(null);
-        projects.add(p3);
-
+        //ייבוא הפרויקטים של המשתמש לרשימה והצגה שלה
 
         adapter = new ProjectsAdapter(projects);
         rvProjects.setAdapter(adapter);
         Log.d("IMPORTANT", "before update list");
-        adapter.updateList(projects);
+        db.collection("projects").whereEqualTo("userId", mauth.getCurrentUser().getUid()).get().addOnSuccessListener(queryDocumentSnapshots -> {
+            projects.addAll(queryDocumentSnapshots.toObjects(Project.class));
+            adapter.updateList(projects);
+        });
+
 
 
 
