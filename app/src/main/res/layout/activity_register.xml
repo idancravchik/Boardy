@@ -12,18 +12,17 @@
         android:id="@+id/tvTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="48dp"
         android:fontFamily="@font/reisinger_michal"
         android:gravity="start"
         android:text="ברוך הבא!"
-        android:textSize="48sp"
-        android:textStyle="bold"
         android:textAlignment="textStart"
         android:textColor="@color/gray_900"
+        android:textSize="48sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvInfo"
@@ -53,6 +52,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
             />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -60,7 +60,7 @@
         android:id="@+id/etPassword"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:minHeight="48dp"
         app:boxStrokeColor="@color/blue_500"
         app:layout_constraintEnd_toEndOf="parent"
@@ -68,10 +68,12 @@
         app:hintEnabled="true"
         android:hint="סיסמא"
         app:hintTextColor="@color/gray_900"
+        app:endIconMode="password_toggle"
         app:layout_constraintTop_toBottomOf="@+id/etEmail">
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textPassword"
             />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -79,7 +81,7 @@
         android:id="@+id/etPasswordVal"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:minHeight="48dp"
         app:boxStrokeColor="@color/blue_500"
         app:layout_constraintEnd_toEndOf="parent"
@@ -87,14 +89,16 @@
         app:hintEnabled="true"
         android:hint="אימות סיסמא"
         app:hintTextColor="@color/gray_900"
+        app:endIconMode="password_toggle"
         app:layout_constraintTop_toBottomOf="@+id/etPassword">
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textPassword"
             />
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/etSchool"
+        android:id="@+id/etFullname"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="42dp"
@@ -103,14 +107,34 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:hintEnabled="true"
-        android:hint="בית ספר"
-
+        android:hint="שם מלא"
         app:hintTextColor="@color/gray_900"
         app:layout_constraintTop_toBottomOf="@+id/etPasswordVal">
-        <com.google.android.material.textfield.MaterialAutoCompleteTextView
+        <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:simpleItems="@array/tempSchools"/>
+            android:layout_height="match_parent"
+            android:inputType="textCapWords" />
+    </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/etSchool"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:minHeight="48dp"
+        app:boxStrokeColor="@color/blue_500"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:hintEnabled="true"
+        android:hint="בית ספר"
+        app:endIconDrawable="@drawable/ic_school"
+        app:endIconMode="custom"
+        app:hintTextColor="@color/gray_900"
+        app:layout_constraintTop_toBottomOf="@+id/etFullname">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:simpleItems="@array/tempSchools" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
@@ -118,8 +142,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="תאריך לידה"
+        android:layout_marginTop="8dp"
         app:endIconDrawable="@drawable/ic_calendar_24"
         app:endIconMode="custom"
+        app:boxStrokeColor="@color/blue_500"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/etSchool">

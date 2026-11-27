@@ -7,6 +7,18 @@ public class Student {
     private long birthDate;
     private String school;
 
+    public Student() {
+
+    }
+
+    public Student(String id, String email, String fullName, long birthDate, String school) {
+        this.id = id;
+        this.email = email;
+        this.fullName = fullName;
+        this.birthDate = birthDate;
+        this.school = school;
+    }
+
     public String getId() {
         return id;
     }

@@ -41,6 +41,7 @@
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textEmailAddress"
             />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -56,10 +57,12 @@
         app:hintEnabled="true"
         android:hint="סיסמא"
         app:hintTextColor="@color/gray_900"
+        app:endIconMode="password_toggle"
         app:layout_constraintTop_toBottomOf="@+id/etEmail">
         <com.google.android.material.textfield.TextInputEditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="textPassword"
             />
     </com.google.android.material.textfield.TextInputLayout>
 
