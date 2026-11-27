@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Intent;
+import android.hardware.usb.UsbDevice;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +20,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.vectordrawable.graphics.drawable.SeekableAnimatedVectorDrawable;
 
 import com.example.devbox.ui.DepthButton;
+import com.flashingservice.Ch55xHidFlasher;
 
 import java.io.IOException;
 
@@ -32,6 +34,7 @@ public class UploaderActivity extends AppCompatActivity {
     private ImageView btnBack;
     private DepthButton btnHome;
     private TextView tvUpload;
+    private TextView tvProjectName;
     private ViewFlipper vfUploader;
 
 
@@ -41,6 +44,8 @@ public class UploaderActivity extends AppCompatActivity {
     private MediaPlayer seHold;
     private MediaPlayer seSuccess;
 
+    private Ch55xHidFlasher flasher;
+
     //-------------------משתנים ותכונות---------------------
     enum UploaderState {
         CONNECTION_COMPILATION,
@@ -49,6 +54,7 @@ public class UploaderActivity extends AppCompatActivity {
     }
     private String cCode; // הקוד מהגנרטור בC שמקבלים באינטנט
     private String projectName; // שם הפרויקט שמקבלים באינטנט
+    private UsbDevice device;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,24 +68,27 @@ public class UploaderActivity extends AppCompatActivity {
 
         vfUploader = findViewById(R.id.vfUploader);
         tvUpload = findViewById(R.id.tvUpload);
+        tvProjectName = findViewById(R.id.tvProjectName);
         btnBack = findViewById(R.id.btnBack);
         btnHome = findViewById(R.id.btnHome);
         btnUpload = findViewById(R.id.btUpload);
         btnUpload_hold = SeekableAnimatedVectorDrawable.create(this, R.drawable.avd_upload_hold);
         btnUpload.setImageDrawable(btnUpload_hold);
+        flasher = new Ch55xHidFlasher(this);
 
         maxDuration = btnUpload_hold.getTotalDuration(); // לוקחים את האורך האמיתי מה-AVD
         timer.setInterpolator(new LinearInterpolator());
         seHold = MediaPlayer.create(this, R.raw.se_button_charge);
         seSuccess = MediaPlayer.create(this, R.raw.se_upload_success);
-        //----------------קוד התחלה----------------
-        updateProcess(UploaderState.UPLOAD_READY);
+
+
+        //----------------קוד תהליך----------------
+        tvProjectName.setText(projectName);
+        updateProcess(UploaderState.CONNECTION_COMPILATION);
+
 
         //----------------ליסנרים------------------
-        btnBack.setOnClickListener(v -> { // חזרה לעמוד הקודם
-            startActivity(new Intent(UploaderActivity.this, EditorActivity.class));
-            finish();
-        });
+        btnBack.setOnClickListener(v -> { startActivity(new Intent(UploaderActivity.this, EditorActivity.class));}); // חזרה לעמוד קודם
         btnHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -126,6 +135,7 @@ public class UploaderActivity extends AppCompatActivity {
         }
     }
 
+    //-----------------תפעול גרפיקה----------------------
     public void finishLoader(View view) throws IOException {
         upload_loaderAvd.stop();
         SeekableAnimatedVectorDrawable finishAvd = SeekableAnimatedVectorDrawable.create(UploaderActivity.this, R.drawable.avd_upload_finish);
@@ -194,6 +204,7 @@ public class UploaderActivity extends AppCompatActivity {
 
         }
     }
+    //----------------------------------------------------
 
 
 }

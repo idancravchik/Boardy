@@ -1,14 +1,22 @@
 package com.example.devbox;
 
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.webkit.ValueCallback;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -29,11 +37,16 @@ import java.sql.Ref;
 
 public class EditorActivity extends AppCompatActivity {
 
+    MediaPlayer mp;
     private FirebaseFirestore db;
     private FirebaseAuth mauth;
+    private WebView webView;
     private BottomSheetDialog dSettings;
     private Button btnSaveSettings;
-    private Button btnSettings;
+    private ImageView btnSettings;
+    private ImageView btnToUpload;
+    private ImageView btnSaveProject;
+    private ImageView btnBack;
     private TextView tvProjectName;
     private TextInputLayout etProjectName;
     private TextInputLayout etDescription;
@@ -51,6 +64,19 @@ public class EditorActivity extends AppCompatActivity {
 
         mauth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+        mp = MediaPlayer.create(this, R.raw.se_upload_success);
+
+        //הגדרת הרשאות והגדרות הוובויו
+        webView = findViewById(R.id.webView);
+        WebSettings settings = webView.getSettings();
+        settings.setJavaScriptEnabled(true);
+        settings.setDomStorageEnabled(true);
+        settings.setAllowFileAccess(true);
+        settings.setSupportZoom(false);
+        settings.setBuiltInZoomControls(false);
+
+        webView.setWebViewClient(new WebViewClient());
+        webView.loadUrl("file:///android_asset/index.html");
 
         dSettings = new BottomSheetDialog(this);
         dSettings.setContentView(R.layout.dialog_project_settings);
@@ -62,6 +88,9 @@ public class EditorActivity extends AppCompatActivity {
         dmSensor2 = dSettings.findViewById(R.id.dmSensor2);
         swPublic = dSettings.findViewById(R.id.swPublic);
         btnSettings = findViewById(R.id.btnSettings);
+        btnToUpload = findViewById(R.id.btnToUpload);
+        btnSaveProject = findViewById(R.id.btnSaveProject);
+        btnBack = findViewById(R.id.btnBack);
         tvProjectName = findViewById(R.id.tvProjectName);
 
         //טוען משתמש נוכחי
@@ -95,13 +124,24 @@ public class EditorActivity extends AppCompatActivity {
                 updateProjectSettings();
             }
         });
-
         btnSettings.setOnClickListener(v -> loadProjectSettings());
+        btnToUpload.setOnClickListener(v -> webView.evaluateJavascript("try { cGenerator.workspaceToCode(ws); } catch (e) { 'ERROR: ' + e.message; }", value -> Log.d("CODEEEE", value)));
+        btnSaveProject.setOnClickListener(v -> saveProject(false));
+        btnBack.setOnClickListener(v -> saveProject(true));
+        getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                saveProject(true);
+            }
+        });
     }
+
+
+
     //נקרא כשפותחים את החלון מפרויקט קיים ואחראי לטעון את הפרויקט לסביבת העבודה
     private void loadProject() {
         tvProjectName.setText(currentProject.getTitle());
-        //TODO: טעינה של המסך בלוקים עצמו
+        webView.evaluateJavascript("Blockly.serialization.workspaces.load(" + currentProject.getBlocksData() + ", ws);", null);
     }
     //נקרא כשלוחצים שמור בהגדרות פרויקט חדש, ואחראי לפתוח אותו כפרויקט חדש בפיירסטור
     private void newProject() {
@@ -247,8 +287,8 @@ public class EditorActivity extends AppCompatActivity {
     //נקרא כשלוחצים שמור בהגדרות פרויקט קיים, ואחראי לעדכן את האובייקט בפיירסטור
 
 
-//נקרא כשפותחים את התפריט הגדרות בפרויקט קיים ואחראי לטעון את המידע הקיים לתוך השדות
-private void loadProjectSettings() {
+    //נקרא כשפותחים את התפריט הגדרות בפרויקט קיים ואחראי לטעון את המידע הקיים לתוך השדות
+    private void loadProjectSettings() {
     //מילוי שדות
     etProjectName.getEditText().setText(currentProject.getTitle());
     etDescription.getEditText().setText(currentProject.getDescription());
@@ -298,7 +338,21 @@ private void loadProjectSettings() {
 
 
 }
-    private void saveProject() {
-        // TODO: שומר את הבלוקים לפיירסטור
+    private void saveProject(boolean exitAfterSave) {
+        webView.evaluateJavascript("Blockly.serialization.workspaces.save(ws);", new ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String value) {
+                //מעדכן את הפיירבייס עם הבלוקים החדשים
+                currentProject.setBlocksData(value);
+                db.collection("projects").document(currentProject.getId()).set(currentProject).addOnSuccessListener(unused -> {
+                    Toast.makeText(EditorActivity.this, "הפרויקט נשמר בהצלחה!", Toast.LENGTH_SHORT).show();
+                    mp.start();
+                    if (exitAfterSave) {
+                        finish();
+                    }
+                });
+
+            }
+        });
     }
 }
