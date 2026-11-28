@@ -50,14 +50,6 @@
             android:windowSoftInputMode="adjustResize" />
         <!-- להחזיר לפולס אחרי שהמסך עובד כמו שצריך! -->
         <activity
-            android:name=".ConsoleActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
-            android:name=".PublicProjectsActivity"
-            android:exported="false"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
             android:name=".PrivateProjectsActivity"
             android:exported="true"
             android:windowSoftInputMode="adjustResize" />

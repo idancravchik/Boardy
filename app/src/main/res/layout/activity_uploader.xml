@@ -68,6 +68,20 @@
                 app:layout_constraintTop_toTopOf="@+id/sd_card"
                 android:layout_marginTop="94dp"/>
 
+            <TextView
+                android:id="@+id/tvUploadCompleted"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/google_sans"
+                android:text="החיבור הושלם!"
+                android:textColor="@color/green_700"
+                android:textSize="20sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toTopOf="@+id/tvProjectName"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginBottom="32dp"
+                android:visibility="invisible"/>
             <ImageView
                 android:id="@+id/imgloader"
                 android:layout_width="120dp"
@@ -97,17 +111,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:id="@+id/clUploader3">
-            <Button
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:id="@+id/btntest"
-                android:onClick="finishLoader"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"/>
 
-
-            <ImageView
+            <com.example.devbox.ui.UploadHoldButton
                 android:id="@+id/btUpload"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -33,6 +33,7 @@ public class PrivateProjectsActivity extends AppCompatActivity {
     private FirebaseAuth mauth;
     private RecyclerView rvProjects;
     private ProjectsAdapter adapter;
+    private ImageView btnBack;
     private ArrayList<Project> projects = new ArrayList<Project>();
 
 
@@ -42,15 +43,14 @@ public class PrivateProjectsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_private_projects);
-
         rvProjects = findViewById(R.id.rvProjects);
+        btnBack = findViewById(R.id.btnBack);
         rvProjects.setLayoutManager(new LinearLayoutManager(this));
         mauth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
 
         //ייבוא הפרויקטים של המשתמש לרשימה והצגה שלה
-
         adapter = new ProjectsAdapter(projects);
         rvProjects.setAdapter(adapter);
         Log.d("IMPORTANT", "before update list");
@@ -59,6 +59,7 @@ public class PrivateProjectsActivity extends AppCompatActivity {
             adapter.updateList(projects);
         });
 
+        btnBack.setOnClickListener(v -> startActivity(new Intent(PrivateProjectsActivity.this, MainActivity.class)));
 
 
 

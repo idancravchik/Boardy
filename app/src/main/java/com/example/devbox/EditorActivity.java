@@ -56,6 +56,7 @@ public class EditorActivity extends AppCompatActivity {
     private String intentfrom;
     private Project currentProject;
     private Student currentStudent;
+    private String cCode; // הקוד המוכן מהגנרטור
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -125,7 +126,21 @@ public class EditorActivity extends AppCompatActivity {
             }
         });
         btnSettings.setOnClickListener(v -> loadProjectSettings());
-        btnToUpload.setOnClickListener(v -> webView.evaluateJavascript("try { cGenerator.workspaceToCode(ws); } catch (e) { 'ERROR: ' + e.message; }", value -> Log.d("CODEEEE", value)));
+        btnToUpload.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //מעביר לתהליך של ההעלאה עם כל המידע שצריך
+                String projectName = currentProject != null ? currentProject.getTitle() : "";
+                webView.evaluateJavascript("cGenerator.workspaceToCode(ws);", value -> {
+                    cCode = value;
+                    Log.d("EDITOR", cCode != null ? cCode : "");
+                    Intent intent = new Intent(EditorActivity.this, UploaderActivity.class);
+                    intent.putExtra("projectName", projectName);
+                    intent.putExtra("cCode", cCode);
+                    startActivity(intent);
+                });
+            }
+        });
         btnSaveProject.setOnClickListener(v -> saveProject(false));
         btnBack.setOnClickListener(v -> saveProject(true));
         getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
@@ -213,6 +228,8 @@ public class EditorActivity extends AppCompatActivity {
             Toast.makeText(this, "הפרויקט שלך נוצר בהצלחה!", Toast.LENGTH_SHORT).show();
             dSettings.dismiss();
             loadProject();
+            //טוענים בלוק בסיס
+            webView.evaluateJavascript("(() => { const b = ws.newBlock('start'); b.setDeletable(false); b.initSvg(); b.render(); b.moveBy(150, 50); })();", null);
         }).addOnFailureListener(e -> {
             btnSaveSettings.setEnabled(true);
             Toast.makeText(this, "שגיאה ביצירת הפרויקט", Toast.LENGTH_SHORT).show();
@@ -276,17 +293,14 @@ public class EditorActivity extends AppCompatActivity {
         db.collection("projects").document(currentProject.getId()).set(currentProject).addOnSuccessListener(aVoid -> {
             btnSaveSettings.setEnabled(true);
             dSettings.setCancelable(true);
-            Toast.makeText(this, "הפרויקט שלך נוצר בהצלחה!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "הפרויקט שלך נשמר בהצלחה!", Toast.LENGTH_SHORT).show();
             dSettings.dismiss();
             loadProject();
         }).addOnFailureListener(e -> {
             btnSaveSettings.setEnabled(true);
-            Toast.makeText(this, "שגיאה ביצירת הפרויקט", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "שגיאה בשמירת הפרויקט", Toast.LENGTH_SHORT).show();
         });
     }
-    //נקרא כשלוחצים שמור בהגדרות פרויקט קיים, ואחראי לעדכן את האובייקט בפיירסטור
-
-
     //נקרא כשפותחים את התפריט הגדרות בפרויקט קיים ואחראי לטעון את המידע הקיים לתוך השדות
     private void loadProjectSettings() {
     //מילוי שדות

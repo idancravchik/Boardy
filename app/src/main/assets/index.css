@@ -15,4 +15,10 @@ body {
   display: none !important;
 }
 
+/*שיהיה נוח לאצבע לגלול את התיבה*/
+
+.blocklyToolboxContents {
+  margin-bottom: 400px;
+}
+
 

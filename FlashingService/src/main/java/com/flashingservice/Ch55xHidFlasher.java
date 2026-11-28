@@ -51,10 +51,47 @@ public class Ch55xHidFlasher {
         void onPermissionResult(boolean granted);
     }
 
+    /**
+     * Listener for automatic CH552 board connection/disconnection events.
+     * All callbacks are delivered on Android's Main (UI) thread.
+     */
+    public interface BoardConnectionListener {
+        /**
+         * Called when a CH552 board is connected, switched to HID Bootloader (if needed),
+         * granted USB permission, and locked in bootloader mode via CMD_HELLO.
+         * Ready for manual {@link #flash(UsbDevice, String, FlasherCallback)}.
+         */
+        void onBoardReady(UsbDevice hidDevice);
+
+        /**
+         * Called when the board is physically disconnected.
+         */
+        void onBoardDisconnected();
+
+        /**
+         * Called when the user denies the USB permission dialog.
+         */
+        void onPermissionDenied();
+
+        /**
+         * Optional callback for connection/handshake errors (e.g. CDC reset timeout).
+         */
+        default void onError(Throwable error) {}
+    }
+
     private final Context context;
     private final UsbManager usbManager;
     private final ExecutorService executor;
     private final Handler mainHandler;
+
+    private BroadcastReceiver usbWatcherReceiver;
+    private BoardConnectionListener connectionListener;
+    private volatile boolean isWatching = false;
+    private volatile boolean isFlashing = false;
+    private volatile boolean isResettingCdc = false;
+    private volatile boolean isPreparingDevice = false;
+    private UsbDevice readyHidDevice = null;
+    private Runnable pendingDisconnectRunnable = null;
 
     public Ch55xHidFlasher(Context context) {
         this.context = context.getApplicationContext();
@@ -166,6 +203,280 @@ public class Ch55xHidFlasher {
     }
 
     /**
+     * Starts watching for a CH552 board (either already connected or plugged in later).
+     * Automatically handles CDC (0xC550) -> HID (0xC55D) reset, requests USB permission,
+     * and sends CMD_HELLO to lock the board in bootloader mode (cancelling the 4s timeout).
+     * Call {@link #stopWatchingBoard()} in Activity.onDestroy() to avoid leaks.
+     */
+    public void startWatchingBoard(BoardConnectionListener listener) {
+        stopWatchingBoard();
+        if (listener == null) return;
+
+        this.connectionListener = listener;
+        this.isWatching = true;
+        this.isResettingCdc = false;
+        this.isPreparingDevice = false;
+        this.readyHidDevice = null;
+
+        usbWatcherReceiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context c, Intent intent) {
+                if (!isWatching || intent == null) return;
+                String action = intent.getAction();
+                UsbDevice dev = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                if (dev == null || dev.getVendorId() != VENDOR_ID) return;
+
+                int pid = dev.getProductId();
+                if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+                    if (pid == PRODUCT_ID) {
+                        handleHidDeviceAttached(dev);
+                    } else if (pid == CDC_PRODUCT_ID) {
+                        handleCdcDeviceAttached(dev);
+                    }
+                } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+                    if (pid == PRODUCT_ID || pid == CDC_PRODUCT_ID) {
+                        handleDeviceDetached(dev);
+                    }
+                }
+            }
+        };
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.registerReceiver(usbWatcherReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            context.registerReceiver(usbWatcherReceiver, filter);
+        }
+
+        // Check if a CH552 board is already plugged in
+        checkAlreadyConnectedBoard();
+    }
+
+    /**
+     * Stops watching for USB board attach/detach events and releases the receiver.
+     */
+    public void stopWatchingBoard() {
+        isWatching = false;
+        isResettingCdc = false;
+        isPreparingDevice = false;
+        readyHidDevice = null;
+        connectionListener = null;
+
+        if (pendingDisconnectRunnable != null) {
+            mainHandler.removeCallbacks(pendingDisconnectRunnable);
+            pendingDisconnectRunnable = null;
+        }
+
+        if (usbWatcherReceiver != null) {
+            try {
+                context.unregisterReceiver(usbWatcherReceiver);
+            } catch (IllegalArgumentException ignored) {
+                // Already unregistered
+            }
+            usbWatcherReceiver = null;
+        }
+    }
+
+    private void checkAlreadyConnectedBoard() {
+        if (!isWatching || isFlashing) return;
+
+        UsbDevice hidDevice = findConnectedDevice();
+        if (hidDevice != null) {
+            handleHidDeviceAttached(hidDevice);
+            return;
+        }
+
+        UsbDevice cdcDevice = findConnectedCdcDevice();
+        if (cdcDevice != null) {
+            handleCdcDeviceAttached(cdcDevice);
+        }
+    }
+
+    private void cancelPendingDisconnect() {
+        if (pendingDisconnectRunnable != null) {
+            mainHandler.removeCallbacks(pendingDisconnectRunnable);
+            pendingDisconnectRunnable = null;
+        }
+    }
+
+    private void handleHidDeviceAttached(UsbDevice hidDevice) {
+        if (!isWatching || isFlashing || isPreparingDevice) return;
+        if (readyHidDevice != null && readyHidDevice.getDeviceId() == hidDevice.getDeviceId()) return;
+
+        cancelPendingDisconnect();
+        isPreparingDevice = true;
+
+        requestPermission(hidDevice, granted -> {
+            if (!isWatching) {
+                isPreparingDevice = false;
+                return;
+            }
+            if (!granted) {
+                isPreparingDevice = false;
+                isResettingCdc = false;
+                BoardConnectionListener l = connectionListener;
+                if (l != null) mainHandler.post(l::onPermissionDenied);
+                return;
+            }
+
+            // Send CMD_HELLO on background thread to lock the bootloader (cancels 4s timeout)
+            executor.execute(() -> {
+                try {
+                    Thread.sleep(150); // Brief settle time for Android USB stack
+                    lockBootloaderWithHello(hidDevice);
+
+                    if (!isWatching) {
+                        isPreparingDevice = false;
+                        return;
+                    }
+
+                    isResettingCdc = false;
+                    isPreparingDevice = false;
+                    readyHidDevice = hidDevice;
+                    BoardConnectionListener l = connectionListener;
+                    if (l != null) {
+                        mainHandler.post(() -> l.onBoardReady(hidDevice));
+                    }
+                } catch (Exception e) {
+                    isPreparingDevice = false;
+                    isResettingCdc = false;
+                    if (!isWatching) return;
+
+                    // If bootloader timed out during permission dialog and jumped to CDC, catch it automatically
+                    UsbDevice cdcFallback = findConnectedCdcDevice();
+                    if (cdcFallback != null) {
+                        mainHandler.post(() -> handleCdcDeviceAttached(cdcFallback));
+                        return;
+                    }
+
+                    BoardConnectionListener l = connectionListener;
+                    if (l != null && findConnectedDevice() != null) {
+                        mainHandler.post(() -> l.onError(e));
+                    }
+                }
+            });
+        });
+    }
+
+    private void handleCdcDeviceAttached(UsbDevice cdcDevice) {
+        if (!isWatching || isFlashing || isPreparingDevice || isResettingCdc) return;
+
+        cancelPendingDisconnect();
+        isPreparingDevice = true;
+
+        requestPermission(cdcDevice, granted -> {
+            if (!isWatching) {
+                isPreparingDevice = false;
+                return;
+            }
+            if (!granted) {
+                isPreparingDevice = false;
+                BoardConnectionListener l = connectionListener;
+                if (l != null) mainHandler.post(l::onPermissionDenied);
+                return;
+            }
+
+            isResettingCdc = true;
+            executor.execute(() -> {
+                try {
+                    sendCdcReset(cdcDevice);
+                    isPreparingDevice = false;
+
+                    // Wait up to 4s for HID Bootloader (0xC55D) to appear
+                    long startTime = System.currentTimeMillis();
+                    while (isWatching && isResettingCdc && (System.currentTimeMillis() - startTime < 4000)) {
+                        Thread.sleep(150);
+                        UsbDevice newHid = findConnectedDevice();
+                        if (newHid != null) {
+                            mainHandler.post(() -> handleHidDeviceAttached(newHid));
+                            return;
+                        }
+                    }
+
+                    if (isWatching && isResettingCdc && readyHidDevice == null) {
+                        isResettingCdc = false;
+                        String visibleDevices = describeConnectedUsbDevices();
+                        BoardConnectionListener l = connectionListener;
+                        if (l != null) {
+                            mainHandler.post(() -> l.onError(
+                                    new IOException("Timed out waiting for CH552 to reboot into HID Bootloader. Visible USB: " + visibleDevices)
+                            ));
+                        }
+                    }
+                } catch (Exception e) {
+                    isPreparingDevice = false;
+                    isResettingCdc = false;
+                    BoardConnectionListener l = connectionListener;
+                    if (isWatching && l != null) {
+                        mainHandler.post(() -> l.onError(e));
+                    }
+                }
+            });
+        });
+    }
+
+    private void handleDeviceDetached(UsbDevice detached) {
+        if (!isWatching || isFlashing || isResettingCdc) return;
+
+        if (readyHidDevice != null && detached.getDeviceId() == readyHidDevice.getDeviceId()) {
+            cancelPendingDisconnect();
+            pendingDisconnectRunnable = () -> {
+                pendingDisconnectRunnable = null;
+                if (!isWatching || isFlashing || isResettingCdc) return;
+
+                if (findConnectedDevice() == null && findConnectedCdcDevice() == null) {
+                    readyHidDevice = null;
+                    BoardConnectionListener l = connectionListener;
+                    if (l != null) l.onBoardDisconnected();
+                } else if (findConnectedDevice() == null) {
+                    // Board rebooted into CDC; re-trigger reset flow
+                    readyHidDevice = null;
+                    checkAlreadyConnectedBoard();
+                }
+            };
+            mainHandler.postDelayed(pendingDisconnectRunnable, 800);
+        }
+    }
+
+    /**
+     * Sends CMD_HELLO to the HID bootloader to confirm readiness and cancel its 4-second auto-jump timeout.
+     */
+    private void lockBootloaderWithHello(UsbDevice device) throws IOException {
+        UsbDeviceConnection connection = usbManager.openDevice(device);
+        if (connection == null) {
+            throw new IOException("Failed to open USB HID device for handshake.");
+        }
+        UsbInterface usbInterface = null;
+        try {
+            usbInterface = device.getInterface(0);
+            if (!connection.claimInterface(usbInterface, true)) {
+                throw new IOException("Failed to claim USB HID interface 0.");
+            }
+            UsbEndpoint epOut = null;
+            UsbEndpoint epIn = null;
+            for (int i = 0; i < usbInterface.getEndpointCount(); i++) {
+                UsbEndpoint ep = usbInterface.getEndpoint(i);
+                if (ep.getDirection() == UsbConstants.USB_DIR_OUT) {
+                    epOut = ep;
+                } else if (ep.getDirection() == UsbConstants.USB_DIR_IN) {
+                    epIn = ep;
+                }
+            }
+            if (epOut == null || epIn == null) {
+                throw new IOException("Required USB HID endpoints (IN/OUT) not found.");
+            }
+            transceive(connection, epOut, epIn, CMD_HELLO, (byte) 0, 0, new byte[0]);
+        } finally {
+            if (usbInterface != null) {
+                connection.releaseInterface(usbInterface);
+            }
+            connection.close();
+        }
+    }
+
+    /**
      * Sends the magic reset byte to a connected CH552 CDC Serial device,
      * commanding it to disconnect USB and jump to the HID Bootloader at 0x2C00.
      */
@@ -202,9 +513,16 @@ public class Ch55xHidFlasher {
                 throw new IOException("Failed to claim CDC interface " + targetInterface.getId());
             }
 
+            // Also claim CDC Control interface (0) if separate, so SET_CONTROL_LINE_STATE succeeds on Android
+            UsbInterface controlInterface = (cdcDevice.getInterfaceCount() > 0 && cdcDevice.getInterface(0) != targetInterface)
+                    ? cdcDevice.getInterface(0)
+                    : null;
+            boolean claimedControl = controlInterface != null && conn.claimInterface(controlInterface, true);
+
             try {
                 // Assert DTR/RTS (CDC Set_Control_Line_State request 0x22, value 0x03)
-                conn.controlTransfer(0x21, 0x22, 0x03, 0, null, 0, 1000);
+                int ctrlIndex = controlInterface != null ? controlInterface.getId() : targetInterface.getId();
+                conn.controlTransfer(0x21, 0x22, 0x03, ctrlIndex, null, 0, 1000);
 
                 // Send the magic reset byte (0xFE)
                 byte[] payload = new byte[]{MAGIC_RESET_BYTE};
@@ -213,11 +531,25 @@ public class Ch55xHidFlasher {
                     throw new IOException("Failed to send reset byte to CDC: transferred " + sent + " bytes.");
                 }
             } finally {
+                if (claimedControl) {
+                    conn.releaseInterface(controlInterface);
+                }
                 conn.releaseInterface(targetInterface);
             }
         } finally {
             conn.close();
         }
+    }
+
+    private String describeConnectedUsbDevices() {
+        HashMap<String, UsbDevice> list = usbManager.getDeviceList();
+        if (list.isEmpty()) return "none";
+        StringBuilder sb = new StringBuilder();
+        for (UsbDevice d : list.values()) {
+            if (sb.length() > 0) sb.append(", ");
+            sb.append(String.format("0x%04X:0x%04X", d.getVendorId(), d.getProductId()));
+        }
+        return sb.toString();
     }
 
     /**
@@ -355,6 +687,8 @@ public class Ch55xHidFlasher {
      */
     public void flash(UsbDevice device, String hexText, FlasherCallback callback) {
         FlasherCallback safeCallback = wrapMainThread(callback);
+        isFlashing = true;
+        cancelPendingDisconnect();
         executor.execute(() -> {
             UsbDeviceConnection connection = null;
             UsbInterface usbInterface = null;
@@ -478,6 +812,8 @@ public class Ch55xHidFlasher {
             } catch (Exception e) {
                 if (safeCallback != null) safeCallback.onError(e);
             } finally {
+                readyHidDevice = null;
+                isFlashing = false;
                 if (usbInterface != null && connection != null) {
                     connection.releaseInterface(usbInterface);
                 }

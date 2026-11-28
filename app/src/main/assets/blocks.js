@@ -1,5 +1,19 @@
 const blocks = [
 {
+  "type": "start",
+  "tooltip": "",
+  "helpUrl": "",
+  "message0": "מתחילים כאן %1",
+  "args0": [
+    {
+      "type": "input_dummy",
+      "name": "NAME"
+    }
+  ],
+  "nextStatement": null,
+  "colour": 225
+},
+{
   "type": "delay",
   "tooltip": "מחכה כמה שניות",
   "helpUrl": "",

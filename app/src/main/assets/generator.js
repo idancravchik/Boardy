@@ -50,7 +50,18 @@ void loop() {
 `;
 };
 
+cGenerator.workspaceToCode = function (workspace) {
+  this.init(workspace);
+  const startBlock = workspace.getBlocksByType('start', false)[0];
+  const code = startBlock ? this.blockToCode(startBlock) : '';
+  return this.finish(code.trim());
+};
+
 // -------------------------------------------------------------
+
+cGenerator.forBlock['start'] = function () {
+  return '';
+};
 
 cGenerator.forBlock['text'] = function (block) {
   const text = block.getFieldValue('NAME');
